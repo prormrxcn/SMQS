@@ -1,21 +1,44 @@
-#include <TroykaMQ.h> // https://github.com/amperka/TroykaMQ
-#define SENSOR_PIN        34
+/*
+  MQ-135 CO2 Measurement Code (ppm)
 
-MQ135 mq135(SENSOR_PIN);
+  Preconditions (MANDATORY):
+  1. RL replaced with 22kΩ on the sensor board
+  2. Sensor preheated for 24 hours
+  3. RLOAD, RZERO, and ATMOCO2 updated in MQ135.h
+*/
+
+#include "MQ135.h"
+
+// -------- USER CONFIG --------
+#define MQ135_PIN A0        // Analog pin connected to MQ-135
+#define SAMPLE_COUNT 20     // Number of samples for averaging
+#define SAMPLE_DELAY 50     // ms between samples
+// -----------------------------
+
+MQ135 gasSensor(MQ135_PIN);
 
 void setup() {
-   Serial.begin(9600);
-   // before calibrating the sensor, warm it up for 60 seconds calibrate the sensor in clean air
-   mq135.calibrate();
-   // if you know the resistance of the sensor in clean air
-   // you can specify it manually, eg: 160 mq135.calibrate(160);   
-   Serial.print("Ro = ");
-   Serial.println(mq135.getRo());
+  Serial.begin(9600);
+  Serial.println("MQ-135 CO2 Measurement Started");
 }
 
 void loop() {
-   // display gas values in ppm
-   Serial.print(mq135.readCO2());
-   Serial.println("ppm");
-   delay(1000);
+
+  // -------- ADC Averaging --------
+  float ppmSum = 0.0;
+
+  for (int i = 0; i < SAMPLE_COUNT; i++) {
+    float ppm = gasSensor.getPPM();
+    ppmSum += ppm;
+    delay(SAMPLE_DELAY);
+  }
+
+  float avgPPM = ppmSum / SAMPLE_COUNT;
+
+  // -------- Output --------
+  Serial.print("CO2 Concentration: ");
+  Serial.print(avgPPM, 2);
+  Serial.println(" ppm");
+
+  delay(2000);
 }
