@@ -2,6 +2,11 @@
 
 > **Do not skip this.** Without calibration, the readings are not scientifically meaningful.
 
+> ### Point to be remember
+ - The lenght of the electrodes should be **15cm**.
+ - The spacing between the electrodes should be **1cm**.
+ - The wire used for the electrode should be emf protected.
+
 ### Required Buffer Solutions
 - **pH 4.00**
 - **pH 6.86**
